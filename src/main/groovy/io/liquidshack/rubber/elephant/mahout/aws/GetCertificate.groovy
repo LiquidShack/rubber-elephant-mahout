@@ -17,29 +17,29 @@ class GetCertificate extends AbstractAwsTask {
 	void runCommand() {
 		println 'Running task [GetCertificate]'
 
-		String cluster = getCluster()
+		String contxt = getContext()
 		String namespace = getNamespace()
-		assert cluster?.trim() && cluster !='null' : '`cluster` needs to be set'
+		assert contxt?.trim() && contxt !='null' : '`contxt` needs to be set'
 		assert namespace?.trim() && namespace != 'null' : '`namespace` needs to be set'
 
 		AWSCertificateManager client  = getAcmClient()
 
 		ListCertificatesRequest request = new ListCertificatesRequest()
 		ListCertificatesResult result =	client.listCertificates(request)
-		String domain = namespace + '.' + cluster
+		String domain = namespace + '.' + contxt
 
 		CertificateSummary found = result.certificateSummaryList.find { certificate ->
 			certificate.domainName.contains(domain)
 		}
 		if (found) {
-			println 'found existing certificate: ' + found
+			println 'Found existing certificate'
 			setCertificate(found.certificateArn)
 		}
 		else {
 			RequestCertificateRequest newCertificateRequest = new RequestCertificateRequest()
 					.withDomainName(domain)
 			RequestCertificateResult newCertificateResult = client.requestCertificate(newCertificateRequest)
-			println 'created new certificate: ' + newCertificateResult
+			println 'Created new certificate'
 			setCertificate(newCertificateResult.certificateArn)
 		}
 	}

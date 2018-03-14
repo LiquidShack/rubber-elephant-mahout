@@ -36,10 +36,10 @@ class GetCredentials extends AbstractAwsTask {
 		credentials.password = ecrCreds[1]
 		credentials.url = authData.proxyEndpoint
 
-		println 'Credentials ECR (for docker push):'
-		println 'user: ' + credentials.user
-		println 'password: ' + credentials.password
-		println 'url: ' + credentials.url
+		println 'Created ECR credentials (for docker push)'
+		//		println 'user: ' + credentials.user
+		//		println 'password: ' + credentials.password
+		//		println 'url: ' + credentials.url
 		setCredentials(credentials)
 	}
 }

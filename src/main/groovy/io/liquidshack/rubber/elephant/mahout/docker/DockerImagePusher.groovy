@@ -27,6 +27,6 @@ class DockerImagePusher extends AbstractDockerTask {
 		def result = pushImageCmd.exec(callback)
 		result.awaitSuccess()
 
-		println 'Pushed image ' + tag
+		println 'Pushed image: ' + tag
 	}
 }

@@ -7,7 +7,7 @@ class EncryptConfig extends AbstractKubernetesTask {
 	@Override
 	void runCommand() {
 
-		String kubeConfigUrl = getKubeConfigUrl()
+		String kubeConfigUrl = getKubeConfig()
 		// TODO add checks here
 		if (kubeConfigUrl) {
 			File contents = new File(kubeConfigUrl)

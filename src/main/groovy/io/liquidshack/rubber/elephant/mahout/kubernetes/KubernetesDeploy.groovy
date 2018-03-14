@@ -41,7 +41,7 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 			IMAGE_NAME: getImageName(),
 			NAMESPACE: getNamespace(),
 			PUBLISH_TAG: getTag(),
-			CLUSTER: getCluster(),
+			CLUSTER: getContext(),
 			CERTIFICATE_ARN: getCertificate()
 		]
 		//kops export kubecfg --name k8-services.dev.ecom.devts.net --state s3://state-store.k8-services.dev.ecom.devts.net
@@ -54,7 +54,7 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 		if (kubeConfig) {
 			File file = new File(kubeConfig)
 			String key = getSecretElephant()
-			assert key?.trim() && key != 'null' : new RubberElephantMahoutException('`cluster` needs to be set in the Kubernetes configuration block')
+			assert key?.trim() && key != 'null' : new RubberElephantMahoutException('`key` needs to be set in the Kubernetes configuration block')
 			String enc = file.text
 			contents = SecretUtils.decode(enc, key)
 		}
@@ -64,53 +64,44 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 		//		S3ObjectInputStream stream = s3request.getObjectContent()
 		//		String contents = stream.getText()
 		//		s3request.close()
-		println 'using state config:'
-		println contents
+		//println 'using state config:'
+		//println contents
 		//		Yaml yaml = new Yaml()
 		//		Config mapped = yaml.loadAs(contents, Config.class)
 		//		Config config = new ConfigBuilder(mapped)
 
 		Config config = new Config()
-		loadFromKubeconfig(config, getCluster(), contents)
+		loadFromKubeconfig(config, getContext(), contents)
 		KubernetesClient client =  new DefaultKubernetesClient(config)
 
-		println 'master urls:'
-		println config.getMasterUrl()
-		println client.getConfiguration().getMasterUrl()
+		println 'master urls: ' + config.getMasterUrl()
 
 		Map<String, String> deployConfigs = new HashMap<String, String>()
 
-		println 'deploy configs:'
+		//		println 'deploy configs:'
 		getDeployConfigs().each { file ->
 			String filtered = PlaceholderReplacer.replace(new File(file), mappings)
 			JsonSlurper slurper = new JsonSlurper()
 			def json = slurper.parseText(filtered)
-			println '--------------------'
-			println filtered
-			println '--------------------'
+			//			println '--------------------'
+			//			println filtered
+			//			println '--------------------'
 			deployConfigs.put(json.kind, filtered)
 		}
 
-		println 'deploy results:'
+		println 'deploy step results:'
 		def namespace = client.load(new ByteArrayInputStream(deployConfigs.get("Namespace").getBytes())).createOrReplace()
-		println '--------------------'
-		println namespace
-		println '--------------------'
+		println 'deployed namespace'
 
 		def deployment = client.load(new ByteArrayInputStream(deployConfigs.get("Deployment").getBytes())).createOrReplace()
-		println '--------------------'
-		println deployment
-		println '--------------------'
+		println 'deployed deployment'
 
 		def hpa  = client.load(new ByteArrayInputStream(deployConfigs.get("HorizontalPodAutoscaler").getBytes())).createOrReplace()
-		println '--------------------'
-		println deployment
-		println '--------------------'
+		println 'deployed hpa'
 
 		def service  = client.load(new ByteArrayInputStream(deployConfigs.get("Service").getBytes())).createOrReplace()
-		println '--------------------'
-		println service
-		println '--------------------'
+		println 'deployed service'
+		println 'deployments complete'
 	}
 
 

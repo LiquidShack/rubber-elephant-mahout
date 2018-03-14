@@ -10,9 +10,9 @@ abstract class AbstractKubernetesTask extends AbstractTask {
 	}
 
 	String getKubeConfig() {
-		String cluster = getCluster()
-		assert cluster?.trim() && cluster != 'null' : new RubberElephantMahoutException('`cluster` needs to be set in the Kubernetes configuration block')
-		return getKubernetesExt().kubeConfigs.get(cluster)
+		String context = getContext()
+		assert context?.trim() && context != 'null' : new RubberElephantMahoutException('`context` has not been configured')
+		return getKubernetesExt().kubeConfigs.get(context)
 	}
 
 	String getSecretElephant() {

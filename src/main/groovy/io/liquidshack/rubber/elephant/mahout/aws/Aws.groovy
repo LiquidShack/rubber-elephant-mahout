@@ -19,9 +19,6 @@ class Aws {
 	String namespace
 
 	@Input
-	String cluster
-
-	@Input
 	String s3region
 
 	Repository repository
