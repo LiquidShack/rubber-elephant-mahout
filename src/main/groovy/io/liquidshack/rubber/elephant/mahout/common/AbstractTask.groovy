@@ -13,6 +13,8 @@ import io.liquidshack.rubber.elephant.mahout.aws.AwsPlugin
 import io.liquidshack.rubber.elephant.mahout.docker.Credentials
 import io.liquidshack.rubber.elephant.mahout.docker.Docker
 import io.liquidshack.rubber.elephant.mahout.docker.DockerPlugin
+import io.liquidshack.rubber.elephant.mahout.git.Git
+import io.liquidshack.rubber.elephant.mahout.git.GitPlugin
 import io.liquidshack.rubber.elephant.mahout.kubernetes.Kubernetes
 import io.liquidshack.rubber.elephant.mahout.kubernetes.KubernetesPlugin
 
@@ -33,6 +35,10 @@ abstract class AbstractTask extends DefaultTask {
 
 	Docker getDockerExt() {
 		return project.extensions.getByName(DockerPlugin.DOCKER_EXT)
+	}
+
+	Git getGitExt() {
+		return project.extensions.getByName(GitPlugin.GIT_EXT)
 	}
 
 	Kubernetes getKubernetesExt() {
@@ -68,8 +74,13 @@ abstract class AbstractTask extends DefaultTask {
 	}
 
 	String getVersion() {
-		getAwsExt().version
+		return getAwsExt().version
 	}
+
+	void setVersion(String version) {
+		getAwsExt().version = version
+	}
+
 
 	String getRegion() {
 		return getAwsExt().region
@@ -79,8 +90,20 @@ abstract class AbstractTask extends DefaultTask {
 		return getAwsExt().s3region
 	}
 
-	String getCluster() {
-		return getAwsExt().cluster
+	String getEnvironment() {
+		return getKubernetesExt().environment
+	}
+
+	void setEnvironment(String environment) {
+		getKubernetesExt().environment = environment
+	}
+
+	String getContext() {
+		return getContext(getEnvironment())
+	}
+
+	String getContext(String environment) {
+		return getKubernetesExt().contexts.get(environment)
 	}
 
 	String getNamespace() {

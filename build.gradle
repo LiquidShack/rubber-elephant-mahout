@@ -1,4 +1,4 @@
-buildscript {
+/*buildscript {
 	repositories {
 		jcenter()
 	}
@@ -9,9 +9,10 @@ buildscript {
 		classpath('com.amazonaws:aws-java-sdk-s3:1.11.283')
 		classpath('com.github.docker-java:docker-java:3.0.14')
 		classpath('io.fabric8:kubernetes-client:3.1.8')
+		classpath('org.eclipse.jgit:org.eclipse.jgit:4.11.0.201803080745-r')
 	}
 }
-
+*/
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
@@ -24,6 +25,7 @@ dependencies {
 	compile('com.amazonaws:aws-java-sdk-s3:1.11.283')
 	compile('com.github.docker-java:docker-java:3.0.14')
 	compile('io.fabric8:kubernetes-client:3.1.8')
+	compile('org.eclipse.jgit:org.eclipse.jgit:4.11.0.201803080745-r')
 }
 
 repositories {
