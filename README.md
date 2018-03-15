@@ -131,6 +131,7 @@ Docker variables
 |imageName|Name of the docker image|yes|
 |imageId|Can override from command|no|
 |tag|Can override from command|no|
+
 ```groovy
 docker {
 	imageName = "elephant"
