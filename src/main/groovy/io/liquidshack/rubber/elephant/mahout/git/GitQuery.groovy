@@ -51,8 +51,11 @@ class GitQuery extends AbstractGitTask {
 			branches.call().each { br ->
 				for (RevCommit commit : git.log().add(repo.resolve(br.name)).call()) {
 					if (commit.name == commitId) {
-						branch = Repository.shortenRefName(br.name)
-						println 'This commit came from branch: ' + br.name + ' : short=' + branch
+						String commitBranch = Repository.shortenRefName(br.name)
+						if (commitBranch != 'HEAD') {
+							println 'This commit came from branch: ' + br.name + ' : short=' + commitBranch
+							break
+						}
 					}
 				}
 			}
