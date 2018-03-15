@@ -54,6 +54,7 @@ class GitQuery extends AbstractGitTask {
 						String commitBranch = Repository.shortenRefName(br.name)
 						if (commitBranch != 'HEAD') {
 							println 'This commit came from branch: ' + br.name + ' : short=' + commitBranch
+							branch = commitBranch
 							break
 						}
 					}
