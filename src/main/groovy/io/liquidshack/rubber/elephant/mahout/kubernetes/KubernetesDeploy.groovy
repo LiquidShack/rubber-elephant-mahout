@@ -1,5 +1,8 @@
 package io.liquidshack.rubber.elephant.mahout.kubernetes
 
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.S3Object
+import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 
@@ -13,7 +16,6 @@ import io.fabric8.kubernetes.client.KubernetesClient
 import io.fabric8.kubernetes.client.internal.KubeConfigUtils
 import io.liquidshack.rubber.elephant.mahout.common.PlaceholderReplacer
 import io.liquidshack.rubber.elephant.mahout.common.RubberElephantMahoutException
-import io.liquidshack.rubber.elephant.mahout.common.SecretUtils
 /*
  deploy: namespace secrets ## Deploy to k8s
  @CLUSTER=$(CLUSTER) REGION=$(REGION) PUBLISH_TAG=$(PUBLISH_TAG) IMAGE_NAME=$(IMAGE_NAME) NAMESPACE=$(NAMESPACE) CERTIFICATE_ARN=$(CERTIFICATE_ARN) sh -c '\
@@ -52,18 +54,22 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 
 		// TODO add checks here
 		if (kubeConfig) {
-			File file = new File(kubeConfig)
-			String key = getSecretElephant()
-			assert key?.trim() && key != 'null' : new RubberElephantMahoutException('`key` needs to be set in the Kubernetes configuration block')
-			String enc = file.text
-			contents = SecretUtils.decode(enc, key)
+
+			String s3bucket = getS3Bucket()
+			assert s3bucket?.trim() && s3bucket != 'null' : new RubberElephantMahoutException('`s3bucket` needs to be set in the Aws configuration block')
+			AmazonS3 s3 = getAmazonS3client();
+			S3Object s3request = s3.getObject(s3bucket,  kubeConfig)
+			S3ObjectInputStream s3stream = s3request.getObjectContent()
+			contents = s3stream.getText()
+			s3request.close()
+
+			//			File file = new File(kubeConfig)
+			//String key = getSecretElephant()
+			//assert key?.trim() && key != 'null' : new RubberElephantMahoutException('`key` needs to be set in the Kubernetes configuration block')
+			//			String enc = file.text
+			//contents = SecretUtils.decode(s3contents, key)
 		}
 
-		//		AmazonS3 s3 = getAmazonS3client();
-		//		S3Object s3request = s3.getObject("state-store." + getCluster(),  getCluster() + "/config")
-		//		S3ObjectInputStream stream = s3request.getObjectContent()
-		//		String contents = stream.getText()
-		//		s3request.close()
 		//		Yaml yaml = new Yaml()
 		//		Config mapped = yaml.loadAs(contents, Config.class)
 		//		Config config = new ConfigBuilder(mapped)

@@ -21,6 +21,9 @@ class Aws {
 	@Input
 	String s3region
 
+	@Input
+	String s3bucket
+
 	Repository repository
 
 	String certificate

@@ -89,6 +89,10 @@ abstract class AbstractTask extends DefaultTask {
 		return getAwsExt().s3region
 	}
 
+	String getS3Bucket() {
+		return getAwsExt().s3bucket
+	}
+
 	String getEnvironment() {
 		String env = getKubernetesExt().environment
 		return env ? env : Kubernetes.DEVELOPMENT

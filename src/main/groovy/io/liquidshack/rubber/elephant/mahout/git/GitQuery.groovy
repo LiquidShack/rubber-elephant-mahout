@@ -66,6 +66,8 @@ class GitQuery extends AbstractGitTask {
 			isRelease = tag.find(/^v(\d+)\.(\d+)/)
 		}
 		println 'is Release? ' + isRelease
+		String masterBranch = getMasterBranch()
+		if (!masterBranch) masterBranch = "master"
 
 		if (isPullRequest) {
 			println 'since it is a pull request, setting environment to DEVELOPMENT'
@@ -77,9 +79,9 @@ class GitQuery extends AbstractGitTask {
 			setEnvironment(Kubernetes.PRODUCTION)
 			setVersion(tag)
 		}
-		else if (branch != getMasterBranch()) {
+		else if (branch != masterBranch) {
 			// This would happen when any push happens into something other than the master branch
-			println 'This is not from the "master" branch [' + getMasterBranch() + '] so going setting environment to DEVELOPMENT'
+			println 'This is not from the "master" branch [' +masterBranch + '] so going setting environment to DEVELOPMENT'
 			setEnvironment(Kubernetes.DEVELOPMENT)
 		}
 		else {
