@@ -64,28 +64,22 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 		//		S3ObjectInputStream stream = s3request.getObjectContent()
 		//		String contents = stream.getText()
 		//		s3request.close()
-		//println 'using state config:'
-		//println contents
 		//		Yaml yaml = new Yaml()
 		//		Config mapped = yaml.loadAs(contents, Config.class)
 		//		Config config = new ConfigBuilder(mapped)
-
+		println 'environment is: ' + getEnvironment()
+		println 'using context: ' + getContext()
 		Config config = new Config()
 		loadFromKubeconfig(config, getContext(), contents)
 		KubernetesClient client =  new DefaultKubernetesClient(config)
 
-		println 'master urls: ' + config.getMasterUrl()
-
+		println 'master url: ' + config.getMasterUrl()
 		Map<String, String> deployConfigs = new HashMap<String, String>()
 
-		//		println 'deploy configs:'
 		getDeployConfigs().each { file ->
 			String filtered = PlaceholderReplacer.replace(new File(file), mappings)
 			JsonSlurper slurper = new JsonSlurper()
 			def json = slurper.parseText(filtered)
-			//			println '--------------------'
-			//			println filtered
-			//			println '--------------------'
 			deployConfigs.put(json.kind, filtered)
 		}
 

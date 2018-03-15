@@ -1,8 +1,10 @@
 package io.liquidshack.rubber.elephant.mahout.git
 
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 
 import io.liquidshack.rubber.elephant.mahout.kubernetes.Kubernetes
@@ -16,10 +18,17 @@ class GitQuery extends AbstractGitTask {
 		String env = System.getenv("CODEBUILD_SRC_DIR")
 
 		if (!env?.trim() || env == 'null') {
-			println 'Env [CODEBUILD_SRC_DIR] not found - using DEVELOPMENT by default. This might be running locally instead of AWS CodeBuild.'
-			setEnvironment(Kubernetes.PRODUCTION)
+			String environment = getEnvironment()
+			if (environment?.trim() && environment != 'null') {
+				println 'Env [CODEBUILD_SRC_DIR] not found - but project extension environment already set so leaving it alone as ' + environment
+			}else {
+				println 'Env [CODEBUILD_SRC_DIR] not found - using DEVELOPMENT by default. This might be running locally instead of AWS CodeBuild.'
+				setEnvironment(Kubernetes.DEVELOPMENT)
+			}
 			return
 		}
+		//println 'CODEBUILD_SOURCE_REPO_URL=' + System.getenv("CODEBUILD_SOURCE_REPO_URL")
+		//println 'CODEBUILD_SOURCE_VERSION=' + System.getenv("CODEBUILD_SOURCE_VERSION")
 
 		String dir = env  + '/.git'
 		println 'Git Directory: ' + dir
@@ -35,12 +44,26 @@ class GitQuery extends AbstractGitTask {
 		println 'Git Branch: ' + branch
 		println 'is Pull Request? ' + isPullRequest
 
-		String tag = git.describe().call()
+		if (!isPullRequest) {
+			println 'Not a Pull Request .. querying for branch this commit came from..'
+			String commitId = branch
+			ListBranchCommand branches = git.branchList().setContains(commitId)
+			branches.call().each { br ->
+				for (RevCommit commit : git.log().add(repo.resolve(br.name)).call()) {
+					if (commit.name == commitId) {
+						branch = Repository.shortenRefName(br.name)
+						println 'This commit came from branch: ' + br.name + ' : short=' + branch
+					}
+				}
+			}
+		}
 
-		println 'Git Tag: ' + tag
+		String tag = git.describe().call()
+		println 'Git tag: ' + tag
+
 		boolean isRelease = false
 		if (tag?.trim() && tag != 'null') {
-			isRelease = tag.startsWith('v')
+			isRelease = tag.find(/^v(\d+)\.(\d+)/)
 		}
 		println 'is Release? ' + isRelease
 
@@ -55,8 +78,8 @@ class GitQuery extends AbstractGitTask {
 			setVersion(tag)
 		}
 		else if (branch != getMasterBranch()) {
-			// This would happen when merging into something other than the master branch ... not sure what else to do here
-			println 'This is not from the master branch [' + getMasterBranch() + '] so going setting environment to DEVELOPMENT'
+			// This would happen when any push happens into something other than the master branch
+			println 'This is not from the "master" branch [' + getMasterBranch() + '] so going setting environment to DEVELOPMENT'
 			setEnvironment(Kubernetes.DEVELOPMENT)
 		}
 		else {
@@ -66,19 +89,18 @@ class GitQuery extends AbstractGitTask {
 	}
 
 	public static void main(String[] args) {
-		String tag = 'v1.1.1'
-		println 'Git Tag: ' + tag
-		boolean isRelease = false
-		if (tag?.trim() && tag != 'null') {
-			isRelease = tag.startsWith('v')
-		}
-		println isRelease
-		return
 
-		String dir = 'C:/Users/gdiamond1271/git/rubber-elephant-mahout/.git'
 
-		//String dir = 'C:/Users/gdiamond1271/git/lucie-mock/.git'
 
+		//String a = 'v1998e8d2529f5efb0dc6399b3c3930e174c1d6624'
+		//boolean r = a.find(/^v(\d+)\.(\d+)/)
+		//println r
+
+		//todo find branches 998e8d2529f5efb0dc6399b3c3930e174c1d6624
+
+		//		String dir = 'C:/Users/gdiamond1271/git/rubber-elephant-mahout/.git'
+
+		String dir = 'C:/Users/gdiamond1271/git/lucie-mock/.git'
 
 		Repository repo = new FileRepositoryBuilder()
 				.setGitDir(new File(dir))
@@ -86,7 +108,24 @@ class GitQuery extends AbstractGitTask {
 				.readEnvironment()
 				.build()
 		Git git = new Git(repo)
+
+
+		git.branchList().setContains("998e8d2529f5efb0dc6399b3c3930e174c1d6624").call().each { ref1 ->
+			println ref1.leaf
+			println ref1.name
+			println ref1.leaf.name
+			println 'and the repo is?'
+			println Repository.shortenRefName(ref1.leaf.name)
+			println ref1.objectId.name
+		}
+
+		return
 		println repo.getBranch()
+
+		println '--- x'
+
+		println repo.getFullBranch()
+
 		println '--- Z'
 
 		println git.describe().call()
@@ -95,7 +134,12 @@ class GitQuery extends AbstractGitTask {
 
 		Ref ref1 = repo.findRef("HEAD")
 		println ref1.leaf
+		println ref1.name
+		println ref1.leaf.name
+		println 'and the repo is?'
+		println Repository.shortenRefName(ref1.leaf.name)
 		println ref1.objectId.name
+		println ref1.target
 
 		println '--- B'
 
@@ -111,10 +155,32 @@ class GitQuery extends AbstractGitTask {
 			}
 
 		}
+		repo.getAllRefs().each { k, v ->
+			println k + ' : ' + v
+		}
 
+		ListBranchCommand bc = git.branchList()
+		bc.call().each { br ->
+			println 'branch: ' + br.name + " | " + br
+			for (RevCommit commit : git.log().add(repo.resolve(br.name)).call()) {
+				println commit.name
+				println commit.getId()
 
-		//		repo.getAllRefs().each { k, v ->
-		//			println k + ' : ' + v
-		//		}
+				if (commit.name == '998e8d2529f5efb0dc6399b3c3930e174c1d6624') {
+					println '************************************'
+					println 'this came from branch: ' + br.name
+					println '************************************'
+				}
+			}
+		}
+
+		println '************************************'
+
+		String treeName = "refs/heads/master"; // tag or branch
+		for (RevCommit commit : git.log().add(repo.resolve(treeName)).call()) {
+			println commit.name
+			println commit.getId()
+		}
+
 	}
 }

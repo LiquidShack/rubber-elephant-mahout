@@ -81,7 +81,6 @@ abstract class AbstractTask extends DefaultTask {
 		getAwsExt().version = version
 	}
 
-
 	String getRegion() {
 		return getAwsExt().region
 	}
@@ -91,7 +90,8 @@ abstract class AbstractTask extends DefaultTask {
 	}
 
 	String getEnvironment() {
-		return getKubernetesExt().environment
+		String env = getKubernetesExt().environment
+		return env ? env : Kubernetes.DEVELOPMENT
 	}
 
 	void setEnvironment(String environment) {

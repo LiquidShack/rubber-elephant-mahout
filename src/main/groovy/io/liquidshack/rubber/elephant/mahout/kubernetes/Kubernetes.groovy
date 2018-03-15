@@ -22,5 +22,7 @@ class Kubernetes {
 	@Input
 	Map<String, String> contexts = [:]
 
-	String environment = DEVELOPMENT
+	@Input
+	@Optional
+	String environment
 }
