@@ -52,27 +52,45 @@ class GitQuery extends AbstractGitTask {
 				for (RevCommit commit : git.log().add(repo.resolve(br.name)).call()) {
 					if (commit.name == commitId) {
 						String commitBranch = Repository.shortenRefName(br.name)
+						branch = commitBranch
+						println 'User: ' + commit.authorIdent
 						if (commitBranch != 'HEAD') {
 							println 'This commit came from branch: ' + br.name + ' : short=' + commitBranch
-							branch = commitBranch
-							println 'User: ' + commit.authorIdent
 							break
+						}
+						else {
+							println 'This commit came from branch: HEAD, going to stash it but keep looking for more branches'
 						}
 					}
 				}
 			}
 		}
 
-		String tag = git.describe().call()
-		println 'Git tag: ' + tag
-
-		boolean isRelease = false
-		if (tag?.trim() && tag != 'null') {
-			isRelease = tag.find(/^v(\d+)\.(\d+)/)
-		}
-		println 'is Release? ' + isRelease
 		String masterBranch = getMasterBranch()
 		if (!masterBranch) masterBranch = "master"
+		boolean isMasterBranch = branch == masterBranch
+
+		println 'is master branch? ' + masterBranch
+
+		String tag = git.describe().call()
+		println 'Git tag: ' + tag
+		boolean isRelease = false
+
+		repo.getTags().each() { iTag, iRef ->
+			println'Tag: ' + iTag + ' : ' + iRef
+			if (iTag == tag) {
+				println 'found matching tag in repo'
+				if (branch == iRef.objectId.name) {
+					println 'branch matches tag ref'
+					if (isMasterBranch) {
+						boolean isReleaseFormat = tag.find(/^v(\d+)\.(\d+)/)
+						println 'isReleaseFormat? ' + isReleaseFormat
+						isRelease = isReleaseFormat
+					}
+				}
+			}
+		}
+		println 'is Release? ' + isRelease
 
 		if (isPullRequest) {
 			println 'since it is a pull request, setting environment to DEVELOPMENT'
@@ -84,7 +102,7 @@ class GitQuery extends AbstractGitTask {
 			setEnvironment(Kubernetes.PRODUCTION)
 			setVersion(tag)
 		}
-		else if (branch != masterBranch) {
+		else if (!isMasterBranch) {
 			// This would happen when any push happens into something other than the master branch
 			println 'This is not from the "master" branch [' +masterBranch + '] so going setting environment to DEVELOPMENT'
 			setEnvironment(Kubernetes.DEVELOPMENT)
@@ -126,7 +144,6 @@ class GitQuery extends AbstractGitTask {
 			println ref1.objectId.name
 		}
 
-		return
 		println repo.getBranch()
 
 		println '--- x'
