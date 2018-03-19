@@ -105,14 +105,14 @@ Some of these can be overridden by passing properties into the gradle command.  
 `./gradlew -Ptag=MYACCOUNT.dkr.ecr.us-east-2.amazonaws.com/elephant/me:v2.1.1 getCertificate deployImage`
 
 Aws variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|region|AWS deployment region|yes|
-|s3region|AWS S3 region can be different from deployment|yes|
-|s3bucket|Bucket than contains the kube configs|yes|
-|repositoryName|ECR repository name|yes|
-|version|This will be used by the docker image tagger.  Will use release tag if available.|yes|
-|namespace|Namespace used for AWS certificates and Kubernetes|yes|
+Variable|Description|Required
+--------|-----------|--------
+region|AWS deployment region|yes
+s3region|AWS S3 region can be different from deployment|yes
+s3bucket|Bucket than contains the kube configs|yes
+repositoryName|ECR repository name|yes
+version|This will be used by the docker image tagger.  Will use release tag if available.|yes
+namespace|Namespace used for AWS certificates and Kubernetes|yes
 
 ```groovy
 aws {
@@ -126,11 +126,11 @@ aws {
 ```
 
 Docker variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|imageName|Name of the docker image|yes|
-|imageId|Can override from command|no|
-|tag|Can override from command|no|
+Variable|Description|Required
+--------|-----------|--------
+imageName|Name of the docker image|yes
+imageId|Can override from command|no
+tag|Can override from command|no
 
 ```groovy
 docker {
@@ -141,13 +141,13 @@ docker {
 ```
 
 Kubernetes variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|deployConfigs|List of deployment config file paths|yes|
-|kubeConfigs|Map of [context : kube config], one for each environment|yes|
-|secretElephant|Secret to decrypt config files|deprecated|
-|contexts|Map of [environment(dev|qa|prod) : context name|yes|
-|environment|Allow overriding environment from command line|no|
+Variable|Description|Required
+--------|-----------|--------
+deployConfigs|List of deployment config file paths|yes
+kubeConfigs|Map of [context : kube config], one for each environment|yes
+secretElephant|Secret to decrypt config files|deprecated
+contexts|Map of [environment(dev|qa|prod) : context name|yes
+environment|Allow overriding environment from command line|no
 
 ```groovy
 kubernetes {
@@ -171,9 +171,9 @@ kubernetes {
 ```
 
 Git variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|masterBranch|Which branch to consider the *master* which is used to choose environment|no - defaults to "master"|
+Variable|Description|Required
+--------|-----------|--------
+masterBranch|Which branch to consider the *master* which is used to choose environment|no - defaults to "master"
 
 ```groovy
 git {

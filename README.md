@@ -15,7 +15,7 @@ This project includes 4 integration components:
 ### Built-in tasks
 There are a number of built in tasks which are defined more thoroughly in the Flow section:
 
-Task|Type|Description|
+Task|Type|Description
 --------|-----------|--------
 gitQuery|GitQuery|Query Git information
 buildImage|DockerImageBuilder|Builds docker image
@@ -27,8 +27,8 @@ deployImage|KubernetesDeploy|Deploys image to Kubernetes cluster
 
 Composite tasks:
 
-Task|Description|
---------|-----------|--------
+Task|Description
+--------|-----------
 publish|Builds and pushes image to ECR
 deploy|Pulishes and then Deploys image to Kubernetes cluster
 
@@ -111,15 +111,15 @@ Some of these can be overridden by passing properties into the gradle command.  
 `./gradlew -Ptag=MYACCOUNT.dkr.ecr.us-east-2.amazonaws.com/elephant/me:v2.1.1 getCertificate deployImage`
 
 Aws variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|region|AWS deployment region|yes|
-|s3region|AWS S3 region can be different from deployment|yes|
-|s3bucket|Bucket than contains the kube configs|yes|
-|repositoryName|ECR repository name|yes|
-|version|This will be used by the docker image tagger.  Will use release tag if available.|yes|
-|namespace|Namespace used for AWS certificates and Kubernetes|yes|
-|createRepo|If true, will create the repo on the fly|no [default=true]|
+Variable|Description|Required
+--------|-----------|--------
+region|AWS deployment region|yes
+s3region|AWS S3 region can be different from deployment|yes
+s3bucket|Bucket than contains the kube configs|yes
+repositoryName|ECR repository name|yes
+version|This will be used by the docker image tagger.  Will use release tag if available.|yes
+namespace|Namespace used for AWS certificates and Kubernetes|yes
+createRepo|If true, will create the repo on the fly|no [default=true]
 
 ```groovy
 aws {
@@ -133,11 +133,11 @@ aws {
 ```
 
 Docker variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|imageName|Name of the docker image|yes|
-|imageId|Can override from command|no|
-|tag|Can override from command|no|
+Variable|Description|Required
+--------|-----------|--------
+imageName|Name of the docker image|yes
+imageId|Can override from command|no
+tag|Can override from command|no
 
 ```groovy
 docker {
@@ -146,11 +146,11 @@ docker {
 ```
 
 Kubernetes variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|deployConfigs|List of deployment config file paths|yes|
-|kubeConfigs|Map of [context : kube config], one for each environment|yes|
-|contexts|Map of [environment(dev|qa|prod) : context name|yes|
+Variable|Description|Required
+--------|-----------|--------
+deployConfigs|List of deployment config file paths|yes
+kubeConfigs|Map of [context : kube config], one for each environment|yes
+contexts|Map of [environment(dev|qa|prod) : context name|yes
 
 Note: instead of the Kubernetes.class import for grabbing the static variables [DEVELOPMENT|QA|PRODUCTION] can just use ["dev"|"qa"|"prod"]
 
@@ -173,9 +173,9 @@ kubernetes {
 ```
 
 Git variables
-|Variable|Description|Required|
-|--------|-----------|--------|
-|masterBranch|Which branch to consider the *master* which is used to choose environment|no - defaults to "master"|
+Variable|Description|Required
+--------|-----------|--------
+masterBranch|Which branch to consider the *master* which is used to choose environment|no - defaults to "master"
 
 ```groovy
 git {
