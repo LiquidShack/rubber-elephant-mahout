@@ -13,22 +13,24 @@ This project includes 4 integration components:
 * Kubernetes
 
 ### Built-in tasks
-There are a number of built in tasks which are defined more thoroughly in the Flow section
-|Task|Type|Description|
-|--------|-----------|--------|
-|gitQuery|GitQuery|Query Git information|
-|buildImage|DockerImageBuilder|Builds docker image|
-|getRepository|RepoManager|Gets ECR|
-|getCredentials|GetCredentials|Get Credentials required for ECR|
-|tagImage|DockerImageTagger|Tags docker image|
-|pushImage|DockerImagePusher|Pushes image to ECR|
-|deployImage|KubernetesDeploy|Deploys image to Kubernetes cluster|
+There are a number of built in tasks which are defined more thoroughly in the Flow section:
 
-Composite tasks
-|Task|Description|
-|--------|-----------|--------|
-|publish|Builds and pushes image to ECR|
-|deploy|Pulishes and then Deploys image to Kubernetes cluster|
+Task|Type|Description|
+--------|-----------|--------
+gitQuery|GitQuery|Query Git information
+buildImage|DockerImageBuilder|Builds docker image
+getRepository|RepoManager|Gets ECR
+getCredentials|GetCredentials|Get Credentials required for ECR
+tagImage|DockerImageTagger|Tags docker image
+pushImage|DockerImagePusher|Pushes image to ECR
+deployImage|KubernetesDeploy|Deploys image to Kubernetes cluster
+
+Composite tasks:
+
+Task|Description|
+--------|-----------|--------
+publish|Builds and pushes image to ECR
+deploy|Pulishes and then Deploys image to Kubernetes cluster
 
 ### Flow
 
