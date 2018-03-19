@@ -24,6 +24,9 @@ class Aws {
 	@Input
 	String s3bucket
 
+	@Input
+	boolean createRepo = true
+
 	Repository repository
 
 	String certificate

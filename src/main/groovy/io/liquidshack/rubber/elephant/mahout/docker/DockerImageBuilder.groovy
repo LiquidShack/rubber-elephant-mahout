@@ -1,21 +1,10 @@
 package io.liquidshack.rubber.elephant.mahout.docker
 
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Optional
-
 import com.github.dockerjava.api.DockerClient
 import com.github.dockerjava.api.command.BuildImageCmd
 import com.github.dockerjava.core.command.BuildImageResultCallback
 
 class DockerImageBuilder extends AbstractDockerTask {
-
-	@Input
-	@Optional
-	Map<String, String> buildArgs = [:]
-
-	@Input
-	@Optional
-	def files
 
 	@Override
 	void runCommand() {
@@ -25,6 +14,8 @@ class DockerImageBuilder extends AbstractDockerTask {
 
 		File baseDirectory = getBaseDirectory()
 		File dockerFile = getDockerFile()
+
+		//File dockerFile = findDockerFile()
 
 		BuildImageCmd buildImageCmd = dockerClient.buildImageCmd()
 				.withBaseDirectory(baseDirectory)
@@ -37,7 +28,7 @@ class DockerImageBuilder extends AbstractDockerTask {
 			buildImageCmd = buildImageCmd.withTags(tags)
 		}
 
-		buildArgs.each { arg, value ->
+		getBuildArgs().each { arg, value ->
 			buildImageCmd = buildImageCmd.withBuildArg(arg, value)
 		}
 
@@ -46,5 +37,13 @@ class DockerImageBuilder extends AbstractDockerTask {
 
 		setImageId(imageId)
 		println "Created image with id: " + imageId
+	}
+
+	private File findDockerFile() {
+		File file = new File(project.file('docker'), 'Dockerfile')
+		if (file.exists())
+			return file
+		file = new File(project.rootProject.file('docker'), 'Dockerfile')
+		return file
 	}
 }

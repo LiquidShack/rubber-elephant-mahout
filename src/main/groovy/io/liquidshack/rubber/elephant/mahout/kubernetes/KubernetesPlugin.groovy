@@ -14,5 +14,10 @@ class KubernetesPlugin implements Plugin<Project> {
 
 		project.extensions.add(KUBERNETES_EXT, Kubernetes)
 		project.tasks.withType(AbstractKubernetesTask)
+
+		if(project.hasProperty('environment'))
+			project.extensions.getByName(KUBERNETES_EXT).environment = project.getProperty('environment')
+
+		project.tasks.create("deployImage", KubernetesDeploy.class) { dependsOn: 'getCertificate' }
 	}
 }

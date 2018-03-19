@@ -1,7 +1,5 @@
 package io.liquidshack.rubber.elephant.mahout.aws
 
-import org.gradle.api.tasks.Input
-
 import com.amazonaws.services.ecr.AmazonECRClient
 import com.amazonaws.services.ecr.model.CreateRepositoryRequest
 import com.amazonaws.services.ecr.model.CreateRepositoryResult
@@ -16,9 +14,6 @@ import io.liquidshack.rubber.elephant.mahout.common.RubberElephantMahoutExceptio
  * 
  */
 class RepoManager extends AbstractAwsTask {
-
-	@Input
-	boolean create
 
 	@Override
 	void runCommand() {

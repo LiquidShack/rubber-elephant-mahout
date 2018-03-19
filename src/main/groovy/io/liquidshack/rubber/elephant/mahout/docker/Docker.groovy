@@ -23,5 +23,13 @@ class Docker {
 	@Optional
 	String tag
 
+	@Input
+	@Optional
+	Map<String, String> buildArgs = [:]
+
+	@Input
+	@Optional
+	def files
+
 	Credentials credentials
 }

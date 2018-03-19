@@ -10,7 +10,6 @@ import io.liquidshack.rubber.elephant.mahout.common.RubberElephantMahoutExceptio
 
 abstract class AbstractAwsTask extends AbstractTask {
 
-
 	AWSCertificateManager getAcmClient() {
 		String region = getRegion()
 		assert region && region != 'null' : new RubberElephantMahoutException('`region` needs to be set in the Aws configuration block')
@@ -29,5 +28,9 @@ abstract class AbstractAwsTask extends AbstractTask {
 				.withRegion(region)
 				.build()
 		return client
+	}
+
+	boolean isCreateRepo() {
+		return getAwsExt().createRepo
 	}
 }

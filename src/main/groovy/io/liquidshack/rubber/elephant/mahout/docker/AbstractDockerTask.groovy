@@ -18,36 +18,24 @@ abstract class AbstractDockerTask extends AbstractTask {
 	}
 
 	File getBaseDirectory() {
-		return project.file('docker')
-		//Docker docker = project.extensions.getByName(DockerPlugin.DOCKER_EXT)
-		//if (docker.baseDirectory) return File(docker.baseDirectory)
-		//return project.buildDir
+		return project.file(getDockerExt().baseDirectory)
 	}
 
 	File getDockerFile() {
-		return new File(getBaseDirectory(), 'Dockerfile')
-		//Docker docker = project.extensions.getByName(DockerPlugin.DOCKER_EXT)
-		//if (docker.dockerFile) return new File(docker.dockerFile)
-		//return new File (project.rootDir, "/Dockerfile")
+		return new File(getBaseDirectory(), getDockerExt().dockerFile)
 	}
 
 	String getImageName() {
 		return getDockerExt().imageName
 	}
 
+	Map<String, String >getBuildArgs() {
+		return getDockerExt().buildArgs
+	}
+
 	DockerClient getDockerClient() {
 		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-				//.withDockerHost(host)
-				//.withDockerTlsVerify(true)
-				//.withDockerCertPath("/home/user/.docker/certs")
-				//.withDockerConfig("/home/user/.docker")
-				//.withApiVersion("1.23")
-				//.withRegistryUrl("https://index.docker.io/v1/")
-				//.withRegistryUsername("dockeruser")
-				//.withRegistryPassword("ilovedocker")
-				//.withRegistryEmail("dockeruser@github.com")
 				.build();
-
 		DockerClient dockerClient = DockerClientBuilder.getInstance(config).build();
 		return dockerClient
 	}

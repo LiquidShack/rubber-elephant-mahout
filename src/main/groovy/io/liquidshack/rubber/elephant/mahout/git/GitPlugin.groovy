@@ -14,5 +14,7 @@ class GitPlugin implements Plugin<Project> {
 
 		project.extensions.add(GIT_EXT, Git)
 		project.tasks.withType(AbstractGitTask)
+
+		project.tasks.create("gitQuery", GitQuery.class)
 	}
 }

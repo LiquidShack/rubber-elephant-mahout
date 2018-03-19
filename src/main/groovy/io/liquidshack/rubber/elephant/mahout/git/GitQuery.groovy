@@ -55,6 +55,7 @@ class GitQuery extends AbstractGitTask {
 						if (commitBranch != 'HEAD') {
 							println 'This commit came from branch: ' + br.name + ' : short=' + commitBranch
 							branch = commitBranch
+							println 'User: ' + commit.authorIdent
 							break
 						}
 					}

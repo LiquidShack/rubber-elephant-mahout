@@ -5,18 +5,28 @@ apply plugin: 'eclipse'
 dependencies {
     compile gradleApi()
     compile localGroovy()
-	compile('com.amazonaws:aws-java-sdk-ecr:1.11.283')
-	compile('com.amazonaws:aws-java-sdk-acm:1.11.283')
-	compile('com.amazonaws:aws-java-sdk-s3:1.11.283')
-	compile('com.github.docker-java:docker-java:3.0.14')
-	compile('io.fabric8:kubernetes-client:3.1.8')
-	compile('org.eclipse.jgit:org.eclipse.jgit:4.11.0.201803080745-r')
+	implementation 'com.amazonaws:aws-java-sdk-ecr:1.11.283'
+	implementation 'com.amazonaws:aws-java-sdk-acm:1.11.283'
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.11.283'
+	implementation 'com.github.docker-java:docker-java:3.0.14'
+	implementation 'io.fabric8:kubernetes-client:3.1.10'
+	implementation 'org.eclipse.jgit:org.eclipse.jgit:4.11.0.201803080745-r'
 }
 
 jar {
-	version = '0.0.1-beta'
+	version = '0.0.2'
 }
 
 repositories {
     jcenter()
+}
+
+task copyToLucieMain(type: Copy) {
+    from "${project.buildDir}/libs"
+    into System.getenv('HOME') + '/git/lucie-main/build-plugins'
+}
+
+task copyToLucieMock(type: Copy) {
+	from "${project.buildDir}/libs"
+	into System.getenv('HOME') + '/git/lucie-mock/build-plugins'
 }
