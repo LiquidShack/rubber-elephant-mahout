@@ -1,5 +1,7 @@
 # rubber-elephant-mahout
 
+Read Me for v0.0.2
+
 Sawadee!  Why Rubber Elephant Mahout?  Well, let's face it - nothing on land compares to an elephant for sheer size and elagance!
 This gradle plugin project was created to fulfill a specific DevOps flow, all bundled into 1 `build.gradle` file.
 
@@ -9,6 +11,24 @@ This project includes 4 integration components:
 * AWS (ECR, ACM, S3) 
 * Docker
 * Kubernetes
+
+### Built-in tasks
+There are a number of built in tasks which are defined more thoroughly in the Flow section
+|Task|Type|Description|
+|--------|-----------|--------|
+|gitQuery|GitQuery|Query Git information|
+|buildImage|DockerImageBuilder|Builds docker image|
+|getRepository|RepoManager|Gets ECR|
+|getCredentials|GetCredentials|Get Credentials required for ECR|
+|tagImage|DockerImageTagger|Tags docker image|
+|pushImage|DockerImagePusher|Pushes image to ECR|
+|deployImage|KubernetesDeploy|Deploys image to Kubernetes cluster|
+
+Composite tasks
+|Task|Description|
+|--------|-----------|--------|
+|publish|Builds and pushes image to ECR|
+|deploy|Pulishes and then Deploys image to Kubernetes cluster|
 
 ### Flow
 
