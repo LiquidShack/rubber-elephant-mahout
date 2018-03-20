@@ -67,10 +67,11 @@ After that, we need to call some other tasks, in this order more or less, to pop
 `deployImage` (type: `KubernetesDeploy`) is the final stage which will grab the configuration files and deploy the project to the cluster (context).  This depends on having a kube config file in the s3 bucket for each environment, and mapped in the Kubernetes block with the map `kubeConfigs`.
 
 There are 2 predefined composite tasks: `publish` and `deploy`
-`publish` will chain together: 'clean','build', 'gitQuery', 'buildImage', 'getRepository', 'getCredentials', 'tagImage', 'pushImage'
-`deploy` will chain together: 'clean','build', 'gitQuery', 'buildImage', 'getRepository', 'getCredentials', 'tagImage', 'pushImage', 'getCertificate', 'deployImage'
 
-for a full deploy, the command is simply:
+* `publish` will chain together: 'clean','build', 'gitQuery', 'buildImage', 'getRepository', 'getCredentials', 'tagImage', 'pushImage'
+* `deploy` will chain together: 'clean','build', 'gitQuery', 'buildImage', 'getRepository', 'getCredentials', 'tagImage', 'pushImage', 'getCertificate', 'deployImage'
+
+so for a full deploy, the command is simply:
 `./gradlew deploy`
 
 And that's the flow in a nutshell!
