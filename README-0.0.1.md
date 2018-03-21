@@ -165,9 +165,9 @@ kubernetes {
 	
 	secretElephant = "$System.env.SECRET_ELEPHANT"
 	
-	contexts = [ ("${Kubernetes.DEVELOPMENT}".toString()) : "k8-services.dev.ecom.devts.net",
-		("${Kubernetes.QA}".toString()) : "k8-services.qa.ecom.devts.net",
-		("${Kubernetes.PRODUCTION}".toString()) : "k8-services.qa.ecom.devts.net" ]
+	contexts = [ ("${Kubernetes.DEVELOPMENT}".toString()) : "dev.elephant.io",
+		("${Kubernetes.QA}".toString()) : "qa.elephant.io",
+		("${Kubernetes.PRODUCTION}".toString()) : "prod.elephant.io" ]
 
 	environment = project.hasProperty('environment') ? project.getProperty('environment') : null
 }
