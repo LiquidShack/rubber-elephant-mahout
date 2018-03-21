@@ -2,6 +2,7 @@ package io.liquidshack.rubber.elephant.mahout.kubernetes
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.internal.reflect.Instantiator
 
 import io.liquidshack.rubber.elephant.mahout.RubberElephantMahout
 
@@ -12,12 +13,13 @@ class KubernetesPlugin implements Plugin<Project> {
 	void apply(Project project) {
 		RubberElephantMahout.start()
 
-		project.extensions.add(KUBERNETES_EXT, Kubernetes)
+		project.extensions.create("kubernetes", Kubernetes, project)
+		project.kubernetes.extensions.environments = project.container(Environment) { String name ->
+			Environment data = project.gradle.services.get(Instantiator).newInstance(Environment, name, project)
+			return data
+		}
+
 		project.tasks.withType(AbstractKubernetesTask)
-
-		if(project.hasProperty('environment'))
-			project.extensions.getByName(KUBERNETES_EXT).environment = project.getProperty('environment')
-
 		project.tasks.create("deployImage", KubernetesDeploy.class) { dependsOn: 'getCertificate' }
 	}
 }

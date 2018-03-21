@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.GradleBuild
 
 import io.liquidshack.rubber.elephant.mahout.aws.AwsPlugin
+import io.liquidshack.rubber.elephant.mahout.common.DumpPropertiesTask
 import io.liquidshack.rubber.elephant.mahout.docker.DockerPlugin
 import io.liquidshack.rubber.elephant.mahout.git.GitPlugin
 import io.liquidshack.rubber.elephant.mahout.kubernetes.KubernetesPlugin
@@ -50,5 +51,7 @@ class RubberElephantMahout implements Plugin<Project> {
 				'deployImage'
 			]
 		}
+
+		project.tasks.create('dump', DumpPropertiesTask.class)
 	}
 }

@@ -14,4 +14,13 @@ class SecretUtils {
 		byte[] decodedLeft =  Base64.getDecoder().decode(extracted);
 		return new String(decodedLeft)
 	}
+
+	public static final String encode(String text) {
+		return Base64.getEncoder().encodeToString(text.getBytes());
+	}
+
+	public static final String decode(String text) {
+		byte[] decoded =  Base64.getDecoder().decode(text)
+		return new String(decoded)
+	}
 }

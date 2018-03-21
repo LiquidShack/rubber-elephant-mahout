@@ -19,7 +19,7 @@ class GetCertificate extends AbstractAwsTask {
 
 		String contxt = getContext()
 		String namespace = getNamespace()
-		assert contxt?.trim() && contxt !='null' : '`contxt` needs to be set'
+		assert contxt?.trim() && contxt !='null' : '`context` needs to be set'
 		assert namespace?.trim() && namespace != 'null' : '`namespace` needs to be set'
 
 		AWSCertificateManager client  = getAcmClient()

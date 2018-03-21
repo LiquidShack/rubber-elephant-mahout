@@ -15,6 +15,7 @@ import io.liquidshack.rubber.elephant.mahout.docker.Docker
 import io.liquidshack.rubber.elephant.mahout.docker.DockerPlugin
 import io.liquidshack.rubber.elephant.mahout.git.Git
 import io.liquidshack.rubber.elephant.mahout.git.GitPlugin
+import io.liquidshack.rubber.elephant.mahout.kubernetes.Environment
 import io.liquidshack.rubber.elephant.mahout.kubernetes.Kubernetes
 import io.liquidshack.rubber.elephant.mahout.kubernetes.KubernetesPlugin
 
@@ -43,6 +44,17 @@ abstract class AbstractTask extends DefaultTask {
 
 	Kubernetes getKubernetesExt() {
 		return project.extensions.getByName(KubernetesPlugin.KUBERNETES_EXT)
+	}
+
+	Environment getEnvironmentData() {
+		String environment = getEnvironment()
+		Environment e = null
+		getKubernetesExt().environments.each { env ->
+			if (env.name == environment) {
+				e = env
+			}
+		}
+		return e
 	}
 
 	Repository getRepository() {
@@ -95,7 +107,7 @@ abstract class AbstractTask extends DefaultTask {
 
 	String getEnvironment() {
 		String env = getKubernetesExt().environment
-		return env ? env : Kubernetes.DEVELOPMENT
+		return env ?: Kubernetes.DEVELOPMENT
 	}
 
 	void setEnvironment(String environment) {
@@ -103,11 +115,7 @@ abstract class AbstractTask extends DefaultTask {
 	}
 
 	String getContext() {
-		return getContext(getEnvironment())
-	}
-
-	String getContext(String environment) {
-		return getKubernetesExt().contexts.get(environment)
+		return getEnvironmentData().context
 	}
 
 	String getNamespace() {

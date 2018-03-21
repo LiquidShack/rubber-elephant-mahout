@@ -11,6 +11,8 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient
 import io.fabric8.kubernetes.client.KubernetesClient
 import io.liquidshack.rubber.elephant.mahout.common.PlaceholderReplacer
 import io.liquidshack.rubber.elephant.mahout.common.RubberElephantMahoutException
+import io.liquidshack.rubber.elephant.mahout.common.SecretUtils
+
 /*
  deploy: namespace secrets ## Deploy to k8s
  @CLUSTER=$(CLUSTER) REGION=$(REGION) PUBLISH_TAG=$(PUBLISH_TAG) IMAGE_NAME=$(IMAGE_NAME) NAMESPACE=$(NAMESPACE) CERTIFICATE_ARN=$(CERTIFICATE_ARN) sh -c '\
@@ -29,11 +31,15 @@ import io.liquidshack.rubber.elephant.mahout.common.RubberElephantMahoutExceptio
  else \
  echo "WARN: DB_USER and DB_PASSWORD are not set, hence not setting secrets";\
  fi
+ //kops export kubecfg --name k8-services.dev.ecom.devts.net --state s3://state-store.k8-services.dev.ecom.devts.net
+ //kops export kubecfg --name k8-services.qa.ecom.devts.net --state s3://state-store.k8-services.qa.ecom.devts.net
  */
 class KubernetesDeploy extends AbstractKubernetesTask {
 
 	@Override
 	void runCommand() {
+		List<String> order = ["Secrets", "Namespace", "Deployment", "HorizontalPodAutoscaler", "Service"]
+
 		Map<String, String> mappings = [
 			IMAGE_NAME: getImageName(),
 			NAMESPACE: getNamespace(),
@@ -41,8 +47,11 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 			CLUSTER: getContext(),
 			CERTIFICATE_ARN: getCertificate()
 		]
-		//kops export kubecfg --name k8-services.dev.ecom.devts.net --state s3://state-store.k8-services.dev.ecom.devts.net
-		//kops export kubecfg --name k8-services.qa.ecom.devts.net --state s3://state-store.k8-services.qa.ecom.devts.net
+
+		mappings << getTemplateMappings()
+		getSecretMappings().each { k, enc ->
+			mappings.put(k, SecretUtils.encode(enc))
+		}
 
 		String contents = null
 		String kubeConfig = getKubeConfig()
@@ -76,17 +85,12 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 		}
 
 		println 'all deployment step results:'
-		def namespace = client.load(new ByteArrayInputStream(deployConfigs.get("Namespace").getBytes())).createOrReplace()
-		println 'deployed namespace'
-
-		def deployment = client.load(new ByteArrayInputStream(deployConfigs.get("Deployment").getBytes())).createOrReplace()
-		println 'deployed deployment'
-
-		def hpa  = client.load(new ByteArrayInputStream(deployConfigs.get("HorizontalPodAutoscaler").getBytes())).createOrReplace()
-		println 'deployed hpa'
-
-		def service  = client.load(new ByteArrayInputStream(deployConfigs.get("Service").getBytes())).createOrReplace()
-		println 'deployed service'
+		order.each { deployConfig ->
+			if (deployConfigs.containsKey(deployConfig)) {
+				def response = client.load(new ByteArrayInputStream(deployConfigs.get(deployConfig).getBytes())).createOrReplace()
+				println 'done applying: ' + deployConfig
+			}
+		}
 		println 'deployments complete'
 	}
 }

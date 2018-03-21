@@ -1,5 +1,6 @@
 package io.liquidshack.rubber.elephant.mahout.kubernetes
 
+import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 
@@ -9,18 +10,10 @@ class Kubernetes {
 	public static final String QA = "qa"
 	public static final String PRODUCTION = "prod"
 
-	List<String> deployConfigs
-
-	@Input
-	@Optional
-	Map<String, String> kubeConfigs = [:]
-
-	@Input
-	@Optional
-	String secretElephant
-
-	@Input
-	Map<String, String> contexts = [:]
+	Project project
+	Kubernetes(Project project) {
+		this.project = project
+	}
 
 	@Input
 	@Optional
