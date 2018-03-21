@@ -148,31 +148,50 @@ docker {
 }
 ```
 
-Kubernetes variables
+Kubernetes variables - per environment block
 
 Variable|Description|Required
 --------|-----------|--------
 deployConfigs|List of deployment config file paths|yes
-kubeConfigs|Map of [context : kube config], one for each environment|yes
-contexts|Map of [environment(dev|qa|prod) : context name|yes
+kubeConfig|Name of kube config file|yes
+context|Name of context to use|yes
+templateMappings|Map of additional variables to replace in yaml config templates|no
+secretMappings|Same as above, but will encode values in Base64|no
 
 Note: instead of the Kubernetes.class import for grabbing the static variables [DEVELOPMENT|QA|PRODUCTION] can just use ["dev"|"qa"|"prod"]
 
 ```groovy
-import io.liquidshack.rubber.elephant.mahout.kubernetes.Kubernetes
 kubernetes {
-	deployConfigs = [ "${project.rootDir}/infra/deploy.yaml",
-		"${project.rootDir}/infra/hpa.yaml",
-		"${project.rootDir}/infra/ns.yaml",
-		"${project.rootDir}/infra/svc.yaml" ]
-	
-	kubeConfigs = [ "context-name-dev" : "config.dev", 
-		"context-name-qa" : "config.qa",
-		"context-name-prod" : "config.prod" ]
-	
-	contexts = [ ("${Kubernetes.DEVELOPMENT}".toString()) : "dev.elephant.io",
-		("${Kubernetes.QA}".toString()) : "qa.elephant.io",
-		("${Kubernetes.PRODUCTION}".toString()) : "prod.elephant.io" ]
+	environments {
+		String[] allDeployConfigs = [ "${project.rootDir}/infra/deploy.yaml",
+			"${project.rootDir}/infra/hpa.yaml",
+			"${project.rootDir}/infra/ns.yaml",
+			"${project.rootDir}/infra/svc.yaml" ]
+			def allTemplateMappings = [ JDBC_CONNECT_STRING : "$System.env.JDBC_CONNECT_STRING" ]
+			def allSecretMappings = [ DB_USER : "$System.env.DB_USER",  DB_PASSWORD : "$System.env.DB_PASSWORD" ]
+			
+		"dev" {
+			deployConfigs = allDeployConfigs
+			kubeConfig = "config.dev"
+			context = "k8-services.dev.ecom.devts.net"
+			templateMappings = allTemplateMappings
+			secretMappings = allSecretMappings
+		}
+		"qa" {
+			deployConfigs = allDeployConfigs
+			kubeConfig = "config.qa"
+			context = "k8-services.qa.ecom.devts.net"
+			templateMappings = allTemplateMappings
+			secretMappings = allSecretMappings
+		}
+		"prod" {
+			deployConfigs = allDeployConfigs
+			kubeConfig = "config.qa"
+			context = "k8-services.qa.ecom.devts.net"
+			templateMappings = allTemplateMappings
+			secretMappings = allSecretMappings
+		}
+	}
 }
 ```
 
