@@ -166,28 +166,29 @@ kubernetes {
 		String[] allDeployConfigs = [ "${project.rootDir}/infra/deploy.yaml",
 			"${project.rootDir}/infra/hpa.yaml",
 			"${project.rootDir}/infra/ns.yaml",
-			"${project.rootDir}/infra/svc.yaml" ]
+			"${project.rootDir}/infra/svc.yaml",
+			"${project.rootDir}/infra/secrets.yaml" ]
 			def allTemplateMappings = [ JDBC_CONNECT_STRING : "$System.env.JDBC_CONNECT_STRING" ]
 			def allSecretMappings = [ DB_USER : "$System.env.DB_USER",  DB_PASSWORD : "$System.env.DB_PASSWORD" ]
 			
 		"dev" {
 			deployConfigs = allDeployConfigs
 			kubeConfig = "config.dev"
-			context = "k8-services.dev.ecom.devts.net"
+			context = "dev.elephant.io"
 			templateMappings = allTemplateMappings
 			secretMappings = allSecretMappings
 		}
 		"qa" {
 			deployConfigs = allDeployConfigs
 			kubeConfig = "config.qa"
-			context = "k8-services.qa.ecom.devts.net"
+			context = "qa.elephant.io"
 			templateMappings = allTemplateMappings
 			secretMappings = allSecretMappings
 		}
 		"prod" {
 			deployConfigs = allDeployConfigs
-			kubeConfig = "config.qa"
-			context = "k8-services.qa.ecom.devts.net"
+			kubeConfig = "config.prod"
+			context = "prod.elephant.io"
 			templateMappings = allTemplateMappings
 			secretMappings = allSecretMappings
 		}
