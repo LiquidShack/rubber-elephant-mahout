@@ -8,7 +8,7 @@ class DockerImageBuilder extends AbstractDockerTask {
 
 	@Override
 	void runCommand() {
-		println 'Running task [DockerImageBuilder]'
+		logger.lifecycle 'Running task [DockerImageBuilder]'
 
 		DockerClient dockerClient = getDockerClient()
 
@@ -36,14 +36,6 @@ class DockerImageBuilder extends AbstractDockerTask {
 		String imageId = buildImageCmd.exec(callback).awaitImageId()
 
 		setImageId(imageId)
-		println "Created image with id: " + imageId
-	}
-
-	private File findDockerFile() {
-		File file = new File(project.file('docker'), 'Dockerfile')
-		if (file.exists())
-			return file
-		file = new File(project.rootProject.file('docker'), 'Dockerfile')
-		return file
+		logger.lifecycle "Created image with id: $imageId"
 	}
 }

@@ -8,4 +8,10 @@ class Git {
 	@Input
 	@Optional
 	String masterBranch
+
+	@Override
+	public String toString() {
+		return """
+			|	masterBranch=$masterBranch""".stripMargin()
+	}
 }

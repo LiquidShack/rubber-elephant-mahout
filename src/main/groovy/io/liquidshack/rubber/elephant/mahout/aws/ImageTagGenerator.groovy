@@ -8,7 +8,7 @@ class ImageTagGenerator extends AbstractAwsTask {
 
 	@Override
 	void runCommand() {
-		println 'Running task [ImageTagGenerator]'
+		logger.lifecycle 'Running task [ImageTagGenerator]'
 
 		Repository repository = getRepository()
 		String version = getVersion()
@@ -16,6 +16,6 @@ class ImageTagGenerator extends AbstractAwsTask {
 		assert version?.trim() && version != 'null' : new RubberElephantMahoutException('`version` has not been set')
 
 		setTag(repository, version)
-		println 'Generated Tag: ' + getTag()
+		logger.lifecycle 'Generated Tag: ' + getTag()
 	}
 }

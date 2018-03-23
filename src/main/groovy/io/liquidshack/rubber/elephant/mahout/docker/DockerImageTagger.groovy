@@ -10,7 +10,7 @@ class DockerImageTagger extends AbstractDockerTask {
 
 	@Override
 	void runCommand() {
-		println 'Running task [DockerImageTagger]'
+		logger.lifecycle 'Running task [DockerImageTagger]'
 
 		DockerClient  dockerClient = getDockerClient()
 
@@ -26,6 +26,6 @@ class DockerImageTagger extends AbstractDockerTask {
 		tagImageCmd.exec()
 
 		setTag(repository, version)
-		printf('Tagged imageId [%s] as [%s]\n', imageId, getTag())
+		logger.lifecycle ('Tagged imageId {} as {}', imageId, getTag())
 	}
 }

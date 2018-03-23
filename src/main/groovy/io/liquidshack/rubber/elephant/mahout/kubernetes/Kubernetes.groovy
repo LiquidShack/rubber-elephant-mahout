@@ -18,4 +18,10 @@ class Kubernetes {
 	@Input
 	@Optional
 	String environment
+
+	@Override
+	public String toString() {
+		return """
+			|	environment=environment""".stripMargin()
+	}
 }

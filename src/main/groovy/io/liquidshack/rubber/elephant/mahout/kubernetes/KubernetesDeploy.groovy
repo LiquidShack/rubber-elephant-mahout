@@ -38,7 +38,7 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 
 	@Override
 	void runCommand() {
-		List<String> order = ["Secrets", "Namespace", "Deployment", "HorizontalPodAutoscaler", "Service"]
+		List<String> order = ["Secret", "Namespace", "Deployment", "HorizontalPodAutoscaler", "Service"]
 
 		Map<String, String> mappings = [
 			IMAGE_NAME: getImageName(),
@@ -51,6 +51,10 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 		mappings << getTemplateMappings()
 		getSecretMappings().each { k, enc ->
 			mappings.put(k, SecretUtils.encode(enc))
+		}
+
+		mappings.each { k,v ->
+			logger.info "$k = $v"
 		}
 
 		String contents = null
@@ -66,13 +70,13 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 			s3request.close()
 		}
 
-		println 'environment is: ' + getEnvironment()
-		println 'using context: ' + getContext()
+		logger.lifecycle 'environment is: ' + getEnvironment()
+		logger.lifecycle 'using context: ' + getContext()
 		Config config = Config.fromKubeconfig(getContext(), contents, null)
 
 		KubernetesClient client =  new DefaultKubernetesClient(config)
 
-		println 'master url: ' + config.getMasterUrl()
+		logger.lifecycle 'master url: ' + config.getMasterUrl()
 		Map<String, String> deployConfigs = new HashMap<String, String>()
 
 		getDeployConfigs().each { file ->
@@ -84,13 +88,15 @@ class KubernetesDeploy extends AbstractKubernetesTask {
 			deployConfigs.put(yaml.kind, json)
 		}
 
-		println 'all deployment step results:'
+		logger.lifecycle 'all deployment step results:'
 		order.each { deployConfig ->
 			if (deployConfigs.containsKey(deployConfig)) {
+				logger.info '-=-=-=-=-=-=-=-=-=-=-=-'
+				logger.info deployConfigs.get(deployConfig)
 				def response = client.load(new ByteArrayInputStream(deployConfigs.get(deployConfig).getBytes())).createOrReplace()
-				println 'done applying: ' + deployConfig
+				logger.lifecycle "done applying: $deployConfig"
 			}
 		}
-		println 'deployments complete'
+		logger.lifecycle 'deployments complete'
 	}
 }

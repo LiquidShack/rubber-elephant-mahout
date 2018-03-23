@@ -32,4 +32,16 @@ class Docker {
 	def files
 
 	Credentials credentials
+
+	@Override
+	public String toString() {
+		return """
+			|	imageName=$imageName
+			|	baseDirectory=$baseDirectory
+			|	dockerFile=$dockerFile
+			|	imageId=$imageId
+			|	tag=$tag
+			|	buildArgs=$buildArgs
+		""".stripMargin()
+	}
 }

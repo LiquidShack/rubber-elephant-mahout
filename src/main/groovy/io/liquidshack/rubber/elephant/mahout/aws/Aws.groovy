@@ -30,4 +30,16 @@ class Aws {
 	Repository repository
 
 	String certificate
+
+	public String toString() {
+		return """
+			|	region=$region
+			|	repositoryName=$repositoryName
+			|	version=$version
+			|	namespace=$namespace
+			|	s3region=$s3region
+			|	s3bucket=$s3bucket
+			|	createRepo=$createRepo
+		""".stripMargin()
+	}
 }

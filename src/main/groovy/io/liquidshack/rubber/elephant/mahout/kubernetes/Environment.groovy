@@ -8,31 +8,26 @@ class Environment {
 	String name
 	Project project
 
-	Environment(String name, Project project) {
-		this.name = name
-		this.project = project
-	}
-
 	Environment() {
 	}
 
-	public Environment(String name, String[] deployConfigs, String kubeConfig, String context,
+	Environment(String name) {
+		this.name = name
+	}
+
+	Environment(String name, Project project) {
+		this(name)
+		this.project = project
+	}
+
+	Environment(String name, String[] deployConfigs, String kubeConfig, String context,
 	Map<String, String> templateMappings, Map<String, String> secretMappings) {
-		super();
-		this.name = name;
+		this(name);
 		this.deployConfigs = deployConfigs;
 		this.kubeConfig = kubeConfig;
 		this.context = context;
 		this.templateMappings = templateMappings;
 		this.secretMappings = secretMappings;
-	}
-
-	Environment(String name) {
-	}
-
-	@Override
-	public String toString() {
-		return "name $name, context $context, kubeconfig: $kubeConfig, deployConfigs: $deployConfigs, templateMappings: $templateMappings, secretMappings: $secretMappings"
 	}
 
 	@Input
@@ -53,4 +48,15 @@ class Environment {
 	@Input
 	@Optional
 	Map<String, String> secretMappings = [:]
+
+	@Override
+	public String toString() {
+		return """
+			|	name=$name
+			|	context=$context
+			|	kubeConfig=$kubeConfig
+			|	deployConfigs=$deployConfigs
+			|	templateMappings=$templateMappings
+			|	secretMappings=$secretMappings""".stripMargin()
+	}
 }

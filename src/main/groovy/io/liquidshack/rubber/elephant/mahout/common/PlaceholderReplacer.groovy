@@ -1,9 +1,14 @@
 package io.liquidshack.rubber.elephant.mahout.common
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 import groovy.text.GStringTemplateEngine
 import groovy.text.TemplateEngine
 
 class PlaceholderReplacer {
+
+	Logger logger = LoggerFactory.getLogger(this.class)
 
 	static String replace(File file, Map<String, String> bindings) {
 		String input = file.getText()
@@ -12,7 +17,7 @@ class PlaceholderReplacer {
 		matcher.each {
 			placeholders.add(it[1])
 		}
-		placeholders.each { key -> println 'found placeholder: ' + key }
+		placeholders.each { key -> logger.info "found placeholder: $key" }
 
 		placeholders.each { key ->
 			if (!bindings.containsKey(key) || bindings.get(key) == 'null' || bindings.get(key) == null) {

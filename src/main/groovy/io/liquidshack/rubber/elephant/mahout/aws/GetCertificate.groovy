@@ -15,7 +15,7 @@ class GetCertificate extends AbstractAwsTask {
 
 	@Override
 	void runCommand() {
-		println 'Running task [GetCertificate]'
+		logger.lifecycle 'Running task [GetCertificate]'
 
 		String contxt = getContext()
 		String namespace = getNamespace()
@@ -32,14 +32,14 @@ class GetCertificate extends AbstractAwsTask {
 			certificate.domainName.contains(domain)
 		}
 		if (found) {
-			println 'Found existing certificate'
+			logger.lifecycle 'Found existing certificate'
 			setCertificate(found.certificateArn)
 		}
 		else {
 			RequestCertificateRequest newCertificateRequest = new RequestCertificateRequest()
 					.withDomainName(domain)
 			RequestCertificateResult newCertificateResult = client.requestCertificate(newCertificateRequest)
-			println 'Created new certificate'
+			logger.lifecycle 'Created new certificate'
 			setCertificate(newCertificateResult.certificateArn)
 		}
 	}

@@ -11,7 +11,7 @@ class DockerImagePusher extends AbstractDockerTask {
 
 	@Override
 	void runCommand() {
-		println 'Running task [DockerImagePusher]'
+		logger.lifecycle 'Running task [DockerImagePusher]'
 
 		Credentials credentials = getCredentials()
 		String tag = getTag()
@@ -27,6 +27,6 @@ class DockerImagePusher extends AbstractDockerTask {
 		def result = pushImageCmd.exec(callback)
 		result.awaitSuccess()
 
-		println 'Pushed image: ' + tag
+		logger.lifecycle "Pushed image: $tag"
 	}
 }

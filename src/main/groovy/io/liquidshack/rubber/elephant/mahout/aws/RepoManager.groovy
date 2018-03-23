@@ -17,14 +17,14 @@ class RepoManager extends AbstractAwsTask {
 
 	@Override
 	void runCommand() {
-		println 'Running task [RepoManager]'
+		logger.quiet 'Running task [RepoManager]'
 
 		String region = getAwsExt().region
 		String repositoryName = getAwsExt().repositoryName
 		assert region?.trim() && region != 'null': new RubberElephantMahoutException('`region` needs to be set')
 		assert repositoryName?.trim() && repositoryName != 'null': new RubberElephantMahoutException('`repositoryName` needs to be set')
 
-		println 'Looking for repository: ' + repositoryName
+		logger.lifecycle "Looking for repository: $repositoryName"
 		AmazonECRClient client = getEcrClient();
 		DescribeRepositoriesRequest request = new DescribeRepositoriesRequest().withRepositoryNames(repositoryName)
 		Repository repository;
@@ -42,7 +42,7 @@ class RepoManager extends AbstractAwsTask {
 		}
 
 		setRepository(repository)
-		println 'Using repository: ' + repository
+		logger.lifecycle 'Using repository: ' + repository
 	}
 
 	private Repository create(String repositoryName) {
@@ -52,7 +52,7 @@ class RepoManager extends AbstractAwsTask {
 				.withRepositoryName(repositoryName)
 		CreateRepositoryResult result = client.executeCreateRepository(request)
 
-		println "Created repository " + result.repository
+		logger.lifecycle "Created repository " + result.repository
 		return result.repository
 	}
 }

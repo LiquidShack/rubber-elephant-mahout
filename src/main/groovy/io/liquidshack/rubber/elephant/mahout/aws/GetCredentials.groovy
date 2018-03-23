@@ -13,7 +13,7 @@ class GetCredentials extends AbstractAwsTask {
 
 	@Override
 	void runCommand() {
-		println 'Running task [GetCredentials]'
+		logger.lifecycle 'Running task [GetCredentials]'
 
 		Aws aws = project.extensions.getByName(AwsPlugin.AWS_EXT)
 		String region = aws.region
@@ -36,10 +36,10 @@ class GetCredentials extends AbstractAwsTask {
 		credentials.password = ecrCreds[1]
 		credentials.url = authData.proxyEndpoint
 
-		println 'Created ECR credentials (for docker push)'
-		//		println 'user: ' + credentials.user
-		//		println 'password: ' + credentials.password
-		//		println 'url: ' + credentials.url
+		logger.lifecycle 'Created ECR credentials (for docker push)'
+		logger.info 'user: ' + credentials.user
+		logger.info 'password: ' + credentials.password
+		logger.info 'url: ' + credentials.url
 		setCredentials(credentials)
 	}
 }

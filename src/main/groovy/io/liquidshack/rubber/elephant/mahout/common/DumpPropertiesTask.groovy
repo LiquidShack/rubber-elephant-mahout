@@ -1,7 +1,5 @@
 package io.liquidshack.rubber.elephant.mahout.common
 
-import io.liquidshack.rubber.elephant.mahout.kubernetes.Environment
-
 class DumpPropertiesTask extends AbstractTask {
 
 	@Override
@@ -9,12 +7,23 @@ class DumpPropertiesTask extends AbstractTask {
 		//		println 'environment: ' + getEnvironment()
 		//		println 'deployConfigs: ' + getKubeData().deployConfigs().each {  println it }
 		//		println 'context: ' + getContext()
-		println 'Environments:'
-		getKubernetesExt().environments.each { k -> println k }
 
-		Environment data = getEnvironmentData()
-		println 'got ' + data.name
+		logger.lifecycle '-=-=-=- AWS -=-=-=-'
+		logger.lifecycle getAwsExt().toString() + "\n"
 
+		logger.lifecycle '-=-=-=- Git -=-=-=-'
+		logger.lifecycle getGitExt().toString() + "\n"
 
+		logger.lifecycle '-=-=-=- Docker -=-=-=-'
+		logger.lifecycle getDockerExt().toString() + "\n"
+
+		logger.lifecycle '-=-=-=- Kubernetes -=-=-=-'
+		logger.lifecycle getKubernetesExt().toString()
+
+		logger.lifecycle '-=-=-=- Environments -=-=-=-'
+		getKubernetesExt().environments.each { env ->
+			logger.lifecycle "	>>> $env.name <<<"
+			logger.lifecycle (env.toString()) + '\n'
+		}
 	}
 }
