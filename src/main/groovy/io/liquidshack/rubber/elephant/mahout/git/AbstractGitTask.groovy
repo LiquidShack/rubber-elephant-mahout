@@ -7,4 +7,8 @@ abstract class AbstractGitTask extends AbstractTask {
 	String getMasterBranch() {
 		return getGitExt().masterBranch
 	}
+
+	String getReleaseFormat() {
+		return getGitExt().releaseFormat
+	}
 }

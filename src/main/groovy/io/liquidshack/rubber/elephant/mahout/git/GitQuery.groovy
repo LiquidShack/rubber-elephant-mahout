@@ -2,7 +2,6 @@ package io.liquidshack.rubber.elephant.mahout.git
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
-import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
@@ -11,18 +10,21 @@ import io.liquidshack.rubber.elephant.mahout.kubernetes.Kubernetes
 
 class GitQuery extends AbstractGitTask {
 
+	static final RELEASE_FORMAT = /^v(\d+)\.(\d+).*/
+
 	@Override
 	void runCommand() {
-		println 'Running task [GitQuery]'
+		logger.lifecycle 'Running task [GitQuery]'
 
 		String env = System.getenv("CODEBUILD_SRC_DIR")
 
 		if (!env?.trim() || env == 'null') {
 			String environment = getEnvironment()
 			if (environment?.trim() && environment != 'null') {
-				println 'Env [CODEBUILD_SRC_DIR] not found - but project extension environment already set so leaving it alone as ' + environment
+				logger.lifecycle 'Env [CODEBUILD_SRC_DIR] not found - but project extension environment already set (or defaulted) so leaving it alone as ' + environment
 			}else {
-				println 'Env [CODEBUILD_SRC_DIR] not found - using DEVELOPMENT by default. This might be running locally instead of AWS CodeBuild.'
+				// This actually won't happen cause getEnvironment() defaults to dev
+				logger.lifecycle 'Env [CODEBUILD_SRC_DIR] not found - using DEVELOPMENT by default. This might be running locally instead of AWS CodeBuild.'
 				setEnvironment(Kubernetes.DEVELOPMENT)
 			}
 			return
@@ -31,7 +33,7 @@ class GitQuery extends AbstractGitTask {
 		//println 'CODEBUILD_SOURCE_VERSION=' + System.getenv("CODEBUILD_SOURCE_VERSION")
 
 		String dir = env  + '/.git'
-		println 'Git Directory: ' + dir
+		logger.lifecycle "Git Directory: $dir"
 
 		Repository repo = new FileRepositoryBuilder()
 				.setGitDir(new File(dir))
@@ -41,21 +43,21 @@ class GitQuery extends AbstractGitTask {
 
 		String branch = repo.getBranch()
 		boolean isPullRequest = branch.startsWith('pr-')
-		println 'Git Branch: ' + branch
-		println 'is Pull Request? ' + isPullRequest
+		logger.lifecycle "Git Branch: [$branch]"
+		logger.lifecycle "is Pull Request? $isPullRequest"
+		String foundBranch = null
 
 		if (!isPullRequest) {
-			println 'Not a Pull Request .. querying for branch this commit came from..'
-			String commitId = branch
-			ListBranchCommand branches = git.branchList().setContains(commitId)
+			logger.lifecycle 'Not a Pull Request .. querying for branch this commit came from..'
+			ListBranchCommand branches = git.branchList().setContains(branch)
 			branches.call().each { br ->
 				for (RevCommit commit : git.log().add(repo.resolve(br.name)).call()) {
-					if (commit.name == commitId) {
+					if (commit.name == branch) {
 						String commitBranch = Repository.shortenRefName(br.name)
-						branch = commitBranch
-						println 'User: ' + commit.authorIdent
+						foundBranch = commitBranch
+						logger.lifecycle "User: [$commit.authorIdent]"
 						if (commitBranch != 'HEAD') {
-							println 'This commit came from branch: ' + br.name + ' : short=' + commitBranch
+							logger.lifecycle "This commit came from branch: [$br.name], short=[$commitBranch]"
 							break
 						}
 						else {
@@ -65,146 +67,56 @@ class GitQuery extends AbstractGitTask {
 				}
 			}
 		}
+		if (foundBranch) branch = foundBranch
 
 		String masterBranch = getMasterBranch()
 		if (!masterBranch) masterBranch = "master"
 		boolean isMasterBranch = branch == masterBranch
 
-		println 'is master branch? ' + masterBranch
+		logger.lifecycle 'is master branch? ' + isMasterBranch
 
 		String tag = git.describe().call()
-		println 'Git tag: ' + tag
+		logger.lifecycle 'Git tag: ' + tag
 		boolean isRelease = false
+		String releaseFormat = getReleaseFormat() ?: RELEASE_FORMAT
+		logger.lifecycle 'Release format: ' + releaseFormat
+		boolean isReleaseFormat = tag.matches(releaseFormat)
+		logger.lifecycle 'Tag match releaseFormat? ' + isReleaseFormat
 
-		repo.getTags().each() { iTag, iRef ->
-			println'Tag: ' + iTag + ' : ' + iRef
-			if (iTag == tag) {
-				println 'found matching tag in repo'
-				if (branch == iRef.objectId.name) {
-					println 'branch matches tag ref'
-					if (isMasterBranch) {
-						boolean isReleaseFormat = tag.find(/^v(\d+)\.(\d+)/)
-						println 'isReleaseFormat? ' + isReleaseFormat
-						isRelease = isReleaseFormat
+		if (isReleaseFormat) {
+			repo.getTags().each() { iTag, iRef ->
+				logger.info'Tag: ' + iTag + ' : ' + iRef
+				if (iTag == tag) {
+					logger.lifecycle 'found matching tag in repo'
+					if (branch == iRef.objectId.name) {
+						logger.lifecycle 'branch matches tag ref'
+						if (isMasterBranch) {
+							isRelease = isReleaseFormat
+						}
 					}
 				}
 			}
 		}
-		println 'is Release? ' + isRelease
+		logger.lifecycle 'is Release? ' + isRelease
 
 		if (isPullRequest) {
-			println 'since it is a pull request, setting environment to DEVELOPMENT'
+			logger.lifecycle 'since it is a pull request, setting environment to DEVELOPMENT'
 			setEnvironment(Kubernetes.DEVELOPMENT)
 		}
 		else if (isRelease) {
-			println 'since it is release, setting environment to PRODUCTION'
-			println 'setting versions to Git Tag: ' + tag
+			logger.lifecycle 'since it is release, setting environment to PRODUCTION'
+			logger.lifecycle 'setting versions to Git Tag: ' + tag
 			setEnvironment(Kubernetes.PRODUCTION)
 			setVersion(tag)
 		}
 		else if (!isMasterBranch) {
 			// This would happen when any push happens into something other than the master branch
-			println 'This is not from the "master" branch [' +masterBranch + '] so going setting environment to DEVELOPMENT'
+			logger.lifecycle "This is not from the 'master' branch [$masterBranch] so going setting environment to DEVELOPMENT"
 			setEnvironment(Kubernetes.DEVELOPMENT)
 		}
 		else {
-			println 'Must be a merge here, so setting environment to QA'
+			logger.lifecycle 'Must be a merge here, so setting environment to QA'
 			setEnvironment(Kubernetes.QA)
 		}
-	}
-
-	public static void main(String[] args) {
-
-
-
-		//String a = 'v1998e8d2529f5efb0dc6399b3c3930e174c1d6624'
-		//boolean r = a.find(/^v(\d+)\.(\d+)/)
-		//println r
-
-		//todo find branches 998e8d2529f5efb0dc6399b3c3930e174c1d6624
-
-		//		String dir = 'C:/Users/gdiamond1271/git/rubber-elephant-mahout/.git'
-
-		String dir = 'C:/Users/gdiamond1271/git/lucie-mock/.git'
-
-		Repository repo = new FileRepositoryBuilder()
-				.setGitDir(new File(dir))
-				.setMustExist(true)
-				.readEnvironment()
-				.build()
-		Git git = new Git(repo)
-
-
-		git.branchList().setContains("998e8d2529f5efb0dc6399b3c3930e174c1d6624").call().each { ref1 ->
-			println ref1.leaf
-			println ref1.name
-			println ref1.leaf.name
-			println 'and the repo is?'
-			println Repository.shortenRefName(ref1.leaf.name)
-			println ref1.objectId.name
-		}
-
-		println repo.getBranch()
-
-		println '--- x'
-
-		println repo.getFullBranch()
-
-		println '--- Z'
-
-		println git.describe().call()
-
-		println '--- A'
-
-		Ref ref1 = repo.findRef("HEAD")
-		println ref1.leaf
-		println ref1.name
-		println ref1.leaf.name
-		println 'and the repo is?'
-		println Repository.shortenRefName(ref1.leaf.name)
-		println ref1.objectId.name
-		println ref1.target
-
-		println '--- B'
-
-		Map<String, Ref> tags = repo.getTags()
-		println 'tags:'
-		tags.each { k, v ->
-			println k + ' : ' + v + ' : ' + v.objectId.name
-
-			if (v.objectId.name == ref1.objectId.name) {
-				println '************************************'
-				println 'found it!'
-				println '************************************'
-			}
-
-		}
-		repo.getAllRefs().each { k, v ->
-			println k + ' : ' + v
-		}
-
-		ListBranchCommand bc = git.branchList()
-		bc.call().each { br ->
-			println 'branch: ' + br.name + " | " + br
-			for (RevCommit commit : git.log().add(repo.resolve(br.name)).call()) {
-				println commit.name
-				println commit.getId()
-
-				if (commit.name == '998e8d2529f5efb0dc6399b3c3930e174c1d6624') {
-					println '************************************'
-					println 'this came from branch: ' + br.name
-					println '************************************'
-				}
-			}
-		}
-
-		println '************************************'
-
-		String treeName = "refs/heads/master"; // tag or branch
-		for (RevCommit commit : git.log().add(repo.resolve(treeName)).call()) {
-			println commit.name
-			println commit.getId()
-		}
-
 	}
 }

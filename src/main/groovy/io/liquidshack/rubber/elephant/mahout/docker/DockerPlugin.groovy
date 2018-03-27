@@ -15,6 +15,8 @@ class DockerPlugin implements Plugin<Project> {
 		project.extensions.add(DOCKER_EXT, Docker)
 		project.tasks.withType(AbstractDockerTask)
 
+		//		project.buildscript.dependencies.add('compile', "com.github.docker-java:docker-java:3.0.14")
+
 		if(project.hasProperty('imageId'))
 			project.extensions.getByName(DockerPlugin.DOCKER_EXT).imageId = project.getProperty('imageId')
 		if(project.hasProperty('tag'))

@@ -20,6 +20,7 @@ class RubberElephantMahout implements Plugin<Project> {
 	@Override
 	public void apply(Project project) {
 		start()
+
 		new AwsPlugin().apply(project)
 		new DockerPlugin().apply(project)
 		new GitPlugin().apply(project)

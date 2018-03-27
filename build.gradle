@@ -1,3 +1,7 @@
+plugins {
+	id 'com.gradle.plugin-publish' version '0.9.7'
+}
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
@@ -13,20 +17,23 @@ dependencies {
 	implementation 'org.eclipse.jgit:org.eclipse.jgit:4.11.0.201803080745-r'
 }
 
-jar {
-	version = '0.0.3'
-}
-
 repositories {
-    jcenter()
+	jcenter()
 }
 
-task copyToLucieMain(type: Copy) {
-    from "${project.buildDir}/libs"
-    into System.getenv('HOME') + '/git/lucie-main/build-plugins'
+jar {
+	version = '0.0.4'
 }
 
-task copyToLucieMock(type: Copy) {
-	from "${project.buildDir}/libs"
-	into System.getenv('HOME') + '/git/lucie-mock/build-plugins'
+pluginBundle {
+	website = 'https://github.com/LiquidShack/rubber-elephant-mahout'
+	vcsUrl = 'https://github.com/LiquidShack/rubber-elephant-mahout.git'
+
+	rubberElephantMahout {
+		id = 'io.liquidshack.rubber-elephant-mahout'
+		displayName = 'Rubber Elephant Mahout'
+		description = 'Glue to perform devops deployments'
+		tags = []
+		version = '0.0.4'
+	}
 }

@@ -9,9 +9,15 @@ class Git {
 	@Optional
 	String masterBranch
 
+	@Input
+	@Optional
+	String releaseFormat
+
 	@Override
 	public String toString() {
 		return """
-			|	masterBranch=$masterBranch""".stripMargin()
+			|	masterBranch=$masterBranch
+			|	releaseFormat=$releaseFormat
+		""".stripMargin()
 	}
 }
