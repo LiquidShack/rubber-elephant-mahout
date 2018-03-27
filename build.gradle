@@ -21,7 +21,8 @@ repositories {
 	jcenter()
 }
 
-version = '0.0.4'
+version = '0.0.5'
+group = 'io.liquidshack'
 
 jar {
 	version = "$version"
@@ -36,7 +37,7 @@ pluginBundle {
 			displayName = 'Rubber Elephant Mahout'
 			description = 'Glue to perform devops deployments'
 			tags = ['LiquidShack']
-			version = '0.0.4'
+			version = '0.0.5'
 		}
 	}
 }
