@@ -21,19 +21,22 @@ repositories {
 	jcenter()
 }
 
+version = '0.0.4'
+
 jar {
-	version = '0.0.4'
+	version = "$version"
 }
 
 pluginBundle {
 	website = 'https://github.com/LiquidShack/rubber-elephant-mahout'
 	vcsUrl = 'https://github.com/LiquidShack/rubber-elephant-mahout.git'
-
-	rubberElephantMahout {
-		id = 'io.liquidshack.rubber-elephant-mahout'
-		displayName = 'Rubber Elephant Mahout'
-		description = 'Glue to perform devops deployments'
-		tags = []
-		version = '0.0.4'
+	plugins {
+		rubberElephantMahoutPlugin {
+			id = 'io.liquidshack.rubber-elephant-mahout'
+			displayName = 'Rubber Elephant Mahout'
+			description = 'Glue to perform devops deployments'
+			tags = ['LiquidShack']
+			version = '0.0.4'
+		}
 	}
 }
