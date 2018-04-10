@@ -4,14 +4,11 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.reflect.Instantiator
 
-import io.liquidshack.rubber.elephant.mahout.RubberElephantMahout
-
 class KubernetesPlugin implements Plugin<Project> {
 
 	public static KUBERNETES_EXT = "kubernetes"
 
 	void apply(Project project) {
-		RubberElephantMahout.start()
 
 		project.extensions.create("kubernetes", Kubernetes, project)
 		project.kubernetes.extensions.environments = project.container(Environment) { String name ->

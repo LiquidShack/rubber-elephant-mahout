@@ -22,7 +22,7 @@ class GitQuery extends AbstractGitTask {
 			String environment = getEnvironment()
 			if (environment?.trim() && environment != 'null') {
 				logger.lifecycle 'Env [CODEBUILD_SRC_DIR] not found - but project extension environment already set (or defaulted) so leaving it alone as ' + environment
-			}else {
+			} else {
 				// This actually won't happen cause getEnvironment() defaults to dev
 				logger.lifecycle 'Env [CODEBUILD_SRC_DIR] not found - using DEVELOPMENT by default. This might be running locally instead of AWS CodeBuild.'
 				setEnvironment(Kubernetes.DEVELOPMENT)
@@ -61,7 +61,7 @@ class GitQuery extends AbstractGitTask {
 							break
 						}
 						else {
-							println 'This commit came from branch: HEAD, going to stash it but keep looking for more branches'
+							logger.lifecycle 'This commit came from branch: HEAD, going to stash it but keep looking for more branches'
 						}
 					}
 				}

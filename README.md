@@ -79,24 +79,16 @@ And that's the flow in a nutshell!
 ### build.gradle
 
 Declare dependencies in the *buildscript* block.
-*TODO:*
-1. Hoping to remove having to declare the dependencies on third parties
-2. Need to deploy plugin to a repo instead of declaring as `files(...)`
 
 ```groovy
 buildscript {
 	repositories {
-		//...
+		maven { url "https://dl.bintray.com/liquidshack/gradle-plugins/" }
+		jcenter()
 	}
 
 	dependencies {
-		classpath files('build-plugins/rubber-elephant-mahout.jar')
-		classpath('com.amazonaws:aws-java-sdk-ecr:1.11.283')
-		classpath('com.amazonaws:aws-java-sdk-acm:1.11.283')
-		classpath('com.amazonaws:aws-java-sdk-s3:1.11.283')
-		classpath('com.github.docker-java:docker-java:3.0.14')
-		classpath('io.fabric8:kubernetes-client:3.1.10')
-		classpath('org.eclipse.jgit:org.eclipse.jgit:4.11.0.201803080745-r')
+		classpath('io.liquidshack:rubber-elephant-mahout:0.0.6')
 	}
 }
 ```
@@ -222,5 +214,3 @@ bootWar {
 	}
 }
 ```
-
-https://github.com/LiquidShack/rubber-elephant-mahout/releases/download/v.0.0.2/rubber-elephant-mahout.jar

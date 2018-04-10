@@ -12,7 +12,7 @@ import io.liquidshack.rubber.elephant.mahout.kubernetes.KubernetesPlugin
 
 class RubberElephantMahout implements Plugin<Project> {
 	private static boolean once
-	public static void start() {
+	void start() {
 		if (!once) println RubberElephantMahout.class.getResource('/title').getText()
 		once = true
 	}
